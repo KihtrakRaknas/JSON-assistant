@@ -12,6 +12,31 @@ function initFirebase(){
 
 var obj;
 
+function initPlainTextInput(){
+	if(firebase.database().ref()!=null){
+		firebase.database().ref().off("value");
+	}
+
+ var text = document.getElementById("jsonInput").innerText
+
+	if(text==null||text==""){
+		displayError("There is no JSON inputed");
+	}else{
+		try {
+			obj = JSON.parse(text);
+			objChanged(obj);
+		}catch(err) {
+			displayError(err.message);
+		}
+	}
+}
+
+function displayError(message){
+	document.getElementById("jsonInputMessage").innerHTML = message;
+	document.getElementById("jsonInputMessage").style.display="block";
+}
+
+
 var containingDiv = document.getElementById("containingDiv");
 
 function configFirebase(){
@@ -25,7 +50,6 @@ function configFirebase(){
 		output.innerText = JSON.stringify(obj);
 		objChanged(obj);
 	});
-
 }
 
 function showData(){
@@ -50,14 +74,15 @@ function scan(funcData, path, div){
 	for(prop in funcData){
 		var count = path.length;
 		var tempObj = document.createElement("div");
-		tempObj.style.whiteSpace = "nowrap";
+		if(linear)
+			tempObj.style.whiteSpace = "nowrap";
 		tempObj.innerText = prop;
 		tempObj.innerHTML="<strong>"+tempObj.innerText+"<span onclick='editObj(this)'>&#x270E;</span><span onclick='deleteObj(this)'>&#x2716;</span></strong>";
 		tempObj.style.borderRadius = "5px";
 		tempObj.style.margin="5px";
 		//tempObj.style.minWidth="5vw";
 		tempObj.style.display = "inline-block";
-		var shadeOfBlack = 255 - (count+1)*10%256;
+		var shadeOfBlack = 255 - (count+1)*30%256;
 		tempObj.style.backgroundColor = "rgb("+shadeOfBlack+", "+shadeOfBlack+", "+shadeOfBlack+")";
 		if(shadeOfBlack<100){
 			tempObj.style.color = "white";
@@ -87,7 +112,8 @@ function scan(funcData, path, div){
 			tempObj.innerHTML+=": "+ val;
 		}
 		//tempObj.style.wordWrap = "break-word";
-		div.appendChild(document.createElement("br"));
+		if(linear)
+			div.appendChild(document.createElement("br"));
 		div.appendChild(tempObj);
 	}
 }
@@ -149,27 +175,27 @@ function editObj(elem){
 	var parentElem = elem.parentNode.parentNode;
 	console.log(elem);
 	console.log(parentElem.firstChild.firstChild);
+
+	var i = 0;
+	var props = [];
+	while(parentElem.hasAttribute("data-path-"+i)){
+		props.push(parentElem.dataset["path-"+i]);
+		i++;
+	}
+	console.log(parentElem.childNodes);
 	var parentName = parentElem.firstChild.firstChild.textContent;
 	console.log(parentElem.firstChild.firstChild.textContent);
-  while (parentElem.lastChild) {
+  while (parentElem.childNodes.length > 1) {
+		console.log(parentElem.lastChild);
     parentElem.removeChild(parentElem.lastChild);
 	}
-	eval("var subObj = obj"+parentElem.dataset.path.replace(/\\/g, "\\\\").replace(/"/g, "\\\"")+";");
-	console.log(parentName);
-	var editText = document.createElement("div");
-	editText.contentEditable = true;
-	//editText.innerHTML += <pre>&#09;</pre>
-	console.log({[parentName]:{subObj}});
-	textScan({[parentName]:{subObj}},editText,0);
-	parentElem.appendChild(editText);
-	//parentElem.innerHTML = "";
-	//var divs = elem.parentNode.parentNode.childNodes.getElementsByTagName("div");
-	//for(var index = divs.length-1; index!=-1; index--){
-			//console.log(divs[index]);
-			//parentElem.removeChild(divs[index]);
-			//console.log(parentElem);
-	//}
-	//eval("obj"+elem.parentNode.parentNode.dataset.path+"='YEET'");
+	var editJSONbox = document.createElement("DIV")
+
+	editJSONbox.contenteditable = "true";
+	console.log(editJSONbox);
+	parentElem.appendChild(editJSONbox);
+
+	//EditWithPath(obj,props,"yeet");
 	//objChanged(obj);
 }
 function deleteObj(elem){
@@ -182,26 +208,41 @@ function deleteObj(elem){
 		i++;
 	}
 	console.log(props);
-	deletePropertyPath(obj,props);
+	EditWithPath(obj,props);
 	objChanged(obj);
 }
 
-//HOW??????????
-//HOW??????????
-function deletePropertyPath (newobj, path) {
+function EditWithPath (newobj, path) {
 	console.log(newobj);
 	console.log(path);
   for (var i = 0; i < path.length - 1; i++) {
 			console.log(path[i]+"test");
     newobj = newobj[path[i]];
-
   }
   delete newobj[path.pop()];
-};
-//HOW??????????
-//HOW??????????
+}
 
+function EditWithPath (newobj, path,newVal) {
+	console.log(newobj);
+	console.log(path);
+  for (var i = 0; i < path.length - 1; i++) {
+			console.log(path[i]+"test");
+    newobj = newobj[path[i]];
+  }
+  newobj[path.pop()] = newVal;
+}
+
+var linear = false;
 function objChanged(NewObj){
+	if(document.getElementById("compact").checked){
+		linear = false;
+	}else {
+		linear = true;
+	}
 	clearDiv();
 	scan(NewObj,[],containingDiv);
 }
+
+document.getElementById("linear").addEventListener("change", function(){
+console.log("tsetasd");
+});

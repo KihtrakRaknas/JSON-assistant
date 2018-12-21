@@ -29,9 +29,24 @@
         </form>
       </div>
     </nav>-->
-    <div style="border-width: 1px;" contenteditable>
+    <div id="jsonInput" style="border:1px solid;border-radius: 7px;min-height:30vh;" contenteditable>
+      </div>
+      <br>
+      <div id="settings" class="container">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons" >
+            <label  class="btn btn-secondary active" >
+              <input id="compact" type="radio" name="options" id="option1" autocomplete="off" onchange="objChanged(obj)" checked> Compact
+            </label>
+            <label class="btn btn-secondary" >
+              <input id="linear" type="radio" name="options" id="option2"  autocomplete="off" onchange="objChanged(obj)"> Linear
+            </label>
+          </div>
+      </div>
 
-    </div>
+      <br>
+      <div id="jsonInputMessage" class="alert alert-danger" role="alert" style="display:none">
+      </div>
+
     <div id = "containingDiv"></div>
 
     <!-- Optional JavaScript -->
