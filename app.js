@@ -66,8 +66,8 @@ document.body.appendChild(output);
 
 var parsedData;
 
-function clearDiv(){
-	containingDiv.innerHTML="";
+function clearDiv(div){
+	div.innerHTML="";
 }
 
 function scan(funcData, path, div){
@@ -77,11 +77,12 @@ function scan(funcData, path, div){
 		if(linear)
 			tempObj.style.whiteSpace = "nowrap";
 		tempObj.innerText = prop;
-		tempObj.innerHTML="<strong>"+tempObj.innerText+"<span onclick='editObj(this)'>&#x270E;</span><span onclick='deleteObj(this)'>&#x2716;</span></strong>";
+		tempObj.innerHTML="<strong>"+tempObj.innerText+"<span onclick='editObj(this)'>✎</span><span onclick='deleteObj(this)'>🗑️</span></strong>";
 		tempObj.style.borderRadius = "5px";
 		tempObj.style.margin="5px";
 		//tempObj.style.minWidth="5vw";
 		tempObj.style.display = "inline-block";
+		tempObj.classList.add("align-top");
 		var shadeOfBlack = 255 - (count+1)*30%256;
 		tempObj.style.backgroundColor = "rgb("+shadeOfBlack+", "+shadeOfBlack+", "+shadeOfBlack+")";
 		if(shadeOfBlack<100){
@@ -175,6 +176,8 @@ function editObj(elem){
 	var parentElem = elem.parentNode.parentNode;
 	console.log(elem);
 	console.log(parentElem.firstChild.firstChild);
+	console.log(parentElem.childNodes[1]);
+	console.log(parentElem.childNodes[1].contentEditable);
 
 	var i = 0;
 	var props = [];
@@ -182,22 +185,78 @@ function editObj(elem){
 		props.push(parentElem.dataset["path-"+i]);
 		i++;
 	}
-	console.log(parentElem.childNodes);
-	var parentName = parentElem.firstChild.firstChild.textContent;
-	console.log(parentElem.firstChild.firstChild.textContent);
-  while (parentElem.childNodes.length > 1) {
-		console.log(parentElem.lastChild);
-    parentElem.removeChild(parentElem.lastChild);
+
+	if(parentElem.childNodes[1].contentEditable!="true"){
+		console.log(parentElem.childNodes);
+		var parentName = parentElem.firstChild.firstChild.textContent;
+		console.log(parentElem.firstChild.firstChild.textContent);
+	  while (parentElem.childNodes.length > 1) {
+			console.log(parentElem.lastChild);
+	    parentElem.removeChild(parentElem.lastChild);
+		}
+		var editJSONbox = document.createElement("DIV")
+
+		editJSONbox.contentEditable = "true";
+		editJSONbox.style.border ="2px solid rgba(0,0,0,.25)"
+		console.log(props);
+		var val=obj;
+		for(var prop of props){
+			val = val[prop]
+		}
+		var txt = JSON.stringify(val, null, "\t");
+		for (var x = 0; x < txt.length; x++)
+		{
+	    var c = txt.charAt(x);
+			if(c=="\t"){
+				editJSONbox.innerText+=txt.substring(0,x);
+				txt=txt.substring(x,txt.length)
+				 x = 0
+				editJSONbox.innerHTML+="&emsp;";
+			}
+		}
+		editJSONbox.innerText+=txt;
+		console.log(editJSONbox);
+		parentElem.appendChild(editJSONbox);
+
+		var cancelBtn = document.createElement("span")
+		//cancelBtn.onClick = cancelEditObj(this);
+		//cancelBtn.innerText = "🗙"
+		var headerBar = elem.parentNode;
+		headerBar.insertBefore(cancelBtn,headerBar.childNodes[2])
+		cancelBtn.outerHTML = "<span onclick='cancelEditObj(this)'> 🗙 </span>"
+
+		headerBar.childNodes[1].innerText=" ✓ "
+		console.log(headerBar);
+	}else{
+		console.log(parentElem.childNodes[1].innerText);
+		var newObj=JSON.parse((parentElem.childNodes[1].innerText).replace(/\s/g, ''));
+		EditWithPath(obj,props,newObj);
+		objChanged(obj);
 	}
-	var editJSONbox = document.createElement("DIV")
 
-	editJSONbox.contenteditable = "true";
-	console.log(editJSONbox);
-	parentElem.appendChild(editJSONbox);
-
-	//EditWithPath(obj,props,"yeet");
+	//
 	//objChanged(obj);
 }
+
+function cancelEditObj(elem){
+	objChanged(obj);
+	/*console.log(elem);
+	var i = 0;
+	var props = [];
+	while(elem.parentNode.parentNode.hasAttribute("data-path-"+i)){
+		props.push(elem.parentNode.parentNode.dataset["path-"+i]);
+		i++;
+	}
+
+	var val=obj;
+	for(var prop of props){
+		val = val[prop]
+	}
+
+	clearDiv(elem.parentNode.parentNode);
+	scan(val,[],elem.parentNode.parentNode);*/
+}
+
 function deleteObj(elem){
 	console.log(elem.parentNode.parentNode);
 	var i = 0;
@@ -208,11 +267,11 @@ function deleteObj(elem){
 		i++;
 	}
 	console.log(props);
-	EditWithPath(obj,props);
+	DeleteWithPath(obj,props);
 	objChanged(obj);
 }
 
-function EditWithPath (newobj, path) {
+function DeleteWithPath (newobj, path) {
 	console.log(newobj);
 	console.log(path);
   for (var i = 0; i < path.length - 1; i++) {
@@ -239,7 +298,7 @@ function objChanged(NewObj){
 	}else {
 		linear = true;
 	}
-	clearDiv();
+	clearDiv(containingDiv);
 	scan(NewObj,[],containingDiv);
 }
 
