@@ -76,8 +76,12 @@ function scan(funcData, path, div){
 		var tempObj = document.createElement("div");
 		if(linear)
 			tempObj.style.whiteSpace = "nowrap";
-		tempObj.innerText = prop;
-		tempObj.innerHTML="<strong>"+tempObj.innerText+"<span onclick='editObj(this)'>✎</span><span onclick='deleteObj(this)'>🗑️</span></strong>";
+		var newHTML="";
+		newHTML="<strong>"+prop.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+		if(icons)
+			newHTML+="<span onclick='editObj(this)' title='Edit'> ✎</span><span onclick='deleteObj(this)' title='Delete'> 🗑️</span>"
+		newHTML+="</strong>";
+		tempObj.innerHTML=newHTML;
 		tempObj.style.borderRadius = "5px";
 		tempObj.style.margin="5px";
 		//tempObj.style.minWidth="5vw";
@@ -105,11 +109,24 @@ function scan(funcData, path, div){
 		if(funcData[prop] !== null && typeof funcData[prop] === 'object'){
 			scan(funcData[prop],temparr,tempObj);
 		}else{
+			tempObj.style.color = "black";
 			var val
-			if(typeof funcData[prop] === 'string')
+			if(typeof funcData[prop] === 'string'){
 				val = "\""+funcData[prop].replace(/</g,"&lt;")+"\"";
-			else
+				tempObj.style.backgroundColor="rgba(12, 176, 168, 0.75)";
+			}else{
+				if(typeof funcData[prop] === 'boolean'){
+					if(funcData[prop])
+						tempObj.style.backgroundColor="rgba(47, 233, 26, 0.75)";
+					else
+						tempObj.style.backgroundColor="rgba(255, 56, 56, 0.75)";
+				}else if(typeof funcData[prop] === 'number'){
+					tempObj.style.backgroundColor="rgba(220, 133, 19, 0.75)";
+				}else{
+					tempObj.style.backgroundColor="rgba(5, 35, 183, 0.75)";
+				}
 				val = funcData[prop];
+			}
 			tempObj.innerHTML+=": "+ val;
 		}
 		//tempObj.style.wordWrap = "break-word";
@@ -223,9 +240,10 @@ function editObj(elem){
 		//cancelBtn.innerText = "🗙"
 		var headerBar = elem.parentNode;
 		headerBar.insertBefore(cancelBtn,headerBar.childNodes[2])
-		cancelBtn.outerHTML = "<span onclick='cancelEditObj(this)'> 🗙 </span>"
+		cancelBtn.outerHTML = "<span onclick='cancelEditObj(this)' title='Cancel'> 🗙 </span>"
 
-		headerBar.childNodes[1].innerText=" ✓ "
+		headerBar.childNodes[1].innerText=" 💾"
+		headerBar.childNodes[1].title="Save"
 		console.log(headerBar);
 	}else{
 		console.log(parentElem.childNodes[1].innerText);
@@ -292,16 +310,29 @@ function EditWithPath (newobj, path,newVal) {
 }
 
 var linear = false;
-function objChanged(NewObj){
-	if(document.getElementById("compact").checked){
+var icons = true;
+function settingChanged(){
+	if(document.getElementById("displayStyle").value=="Compact")
 		linear = false;
-	}else {
+	else
 		linear = true;
+	if(document.getElementById("iconsDisplay").value=="Show")
+		icons = true;
+	else
+		icons = false;
+	if(document.getElementById("Input Field").checked){
+		icons = true;
+		$( "#jsonInput" ).slideDown()
+	}else if(document.getElementById("JSON file").checked){
+		$( "#jsonInput" ).slideUp()
+		icons = true;
+	}else{
+		$( "#jsonInput" ).slideUp()
+		icons = false;
 	}
+		objChanged(obj);
+}
+function objChanged(NewObj){
 	clearDiv(containingDiv);
 	scan(NewObj,[],containingDiv);
 }
-
-document.getElementById("linear").addEventListener("change", function(){
-console.log("tsetasd");
-});

@@ -32,13 +32,42 @@
     <div id="jsonInput" style="border:1px solid;border-radius: 7px;min-height:30vh;" contenteditable>
       </div>
       <br>
-      <div id="settings" class="container">
+      <div id="settings" class="container form-inline">
+
+        <div class="input-group mb-3 align-middle" style="margin:5px!important">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="displayStyle">Display Style</label>
+          </div>
+          <select class="custom-select" onchange="settingChanged()" id="displayStyle">
+            <option selected value="Compact">Compact</option>
+            <option value="Linear">Linear</option>
+          </select>
+        </div>
+
+        <div class="input-group mb-3 align-middle" style="margin:5px!important">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="iconsDisplay">Icons</label>
+          </div>
+          <select class="custom-select" onchange="settingChanged()" id="iconsDisplay">
+            <option selected value="Show">Show</option>
+            <option value="Hide">Hide</option>
+          </select>
+        </div>
+
+
+
           <div class="btn-group btn-group-toggle" data-toggle="buttons" >
-            <label  class="btn btn-secondary active" >
-              <input id="compact" type="radio" name="options" id="option1" autocomplete="off" onchange="objChanged(obj)" checked> Compact
+            <div class="input-group-prepend">
+              <div class="input-group-text" id="btnGroupAddon">Input type</div>
+            </div>
+            <label  class="btn btn-outline-secondary active" >
+              <input id="Input Field" type="radio" name="options" id="option1" autocomplete="off" onchange="settingChanged()" checked> Input Field
             </label>
-            <label class="btn btn-secondary" >
-              <input id="linear" type="radio" name="options" id="option2"  autocomplete="off" onchange="objChanged(obj)"> Linear
+            <label class="btn btn-outline-secondary" >
+              <input id="JSON file" type="radio" name="options" id="option2"  autocomplete="off" onchange="settingChanged()"> JSON file
+            </label>
+            <label class="btn btn-outline-secondary" >
+              <input id="Firebase" type="radio" name="options" id="option2"  autocomplete="off" onchange="settingChanged()"> Firebase
             </label>
           </div>
       </div>
@@ -51,10 +80,9 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
     <script src="app.js"></script>
 
   </body>
